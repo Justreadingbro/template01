@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maya Chen — Video Editor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:   #0A0A0A;
+      --grey:    #3A3A3A;
+      --mid:     #6B6B6B;
+      --offwhite:#F0EDE6;
+      --amber:   #E8A838;
+      --teal:    #2A5F6B;
+      --card-bg: #111111;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--offwhite);
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 3rem;
+      background: rgba(10,10,10,0.85);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .nav-logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+      color: var(--offwhite);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--amber); }
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--mid);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--offwhite); }
+
+    /* ── FILMSTRIP TICKER ── */
+    .filmstrip-wrap {
+      overflow: hidden;
+      white-space: nowrap;
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      border-top: 1px solid rgba(232,168,56,0.15);
+      padding: 0.6rem 0;
+    }
+    .filmstrip-track {
+      display: inline-block;
+      animation: ticker 28s linear infinite;
+    }
+    .filmstrip-track span {
+      display: inline-block;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: rgba(232,168,56,0.45);
+      padding: 0 2.5rem;
+    }
+    .filmstrip-track span::before {
+      content: '◆';
+      margin-right: 2.5rem;
+      color: rgba(232,168,56,0.2);
+    }
+    @keyframes ticker {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 3rem;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 70% 50%, rgba(42,95,107,0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 20% 80%, rgba(232,168,56,0.06) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 1.8rem;
+    }
+    .hero-headline {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(3rem, 7vw, 6.5rem);
+      font-weight: 700;
+      line-height: 1.0;
+      letter-spacing: -0.03em;
+      max-width: 900px;
+      margin-bottom: 2rem;
+    }
+    .hero-headline em {
+      font-style: normal;
+      color: var(--amber);
+    }
+    .hero-headline .line2 {
+      color: rgba(240,237,230,0.35);
+      font-weight: 300;
+    }
+    .hero-sub {
+      font-size: 1.05rem;
+      color: var(--mid);
+      max-width: 480px;
+      line-height: 1.7;
+      margin-bottom: 3rem;
+    }
+    .hero-ctas {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    .btn-primary {
+      background: var(--amber);
+      color: var(--black);
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 0.85rem 2rem;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover { background: #f0b84a; transform: translateY(-1px); }
+    .btn-ghost {
+      color: var(--offwhite);
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 500;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 0.85rem 2rem;
+      border: 1px solid rgba(240,237,230,0.2);
+      text-decoration: none;
+      display: inline-block;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-ghost:hover { border-color: var(--offwhite); }
+
+    .hero-stats {
+      position: absolute;
+      right: 3rem;
+      bottom: 6rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+    .stat-item { text-align: right; }
+    .stat-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--offwhite);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.72rem;
+      color: var(--mid);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* ── SECTION SHARED ── */
+    section { padding: 6rem 3rem; }
+    .section-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 0.75rem;
+    }
+    .section-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.8rem, 3.5vw, 3rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 3.5rem;
+      color: var(--offwhite);
+    }
+    .section-title span { color: var(--mid); font-weight: 300; }
+
+    /* ── WORK / PROJECTS ── */
+    #work { border-top: 1px solid rgba(255,255,255,0.06); }
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1.25rem;
+    }
+    .project-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.05);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.3s, border-color 0.3s;
+      position: relative;
+    }
+    .project-card:hover { transform: translateY(-4px); border-color: rgba(232,168,56,0.3); }
+    .project-card:hover .card-overlay { opacity: 1; }
+    .project-card:hover .play-btn { transform: scale(1); opacity: 1; }
+
+    .project-card.wide  { grid-column: span 7; }
+    .project-card.tall  { grid-column: span 5; }
+    .project-card.third { grid-column: span 4; }
+
+    .card-thumb {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: var(--grey);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .card-thumb.ratio-tall { aspect-ratio: 3/4; }
+
+    /* Placeholder gradient thumbs — replace with <img> or <video poster> */
+    .thumb-1 { background: linear-gradient(135deg, #1a2a3a 0%, #2A5F6B 60%, #0f1f2f 100%); }
+    .thumb-2 { background: linear-gradient(135deg, #2a1a0a 0%, #6b3a10 60%, #1f0f00 100%); }
+    .thumb-3 { background: linear-gradient(135deg, #1a1a2a 0%, #3a2a6b 60%, #0f0f1f 100%); }
+    .thumb-4 { background: linear-gradient(135deg, #1a2a1a 0%, #2a6b3a 60%, #0f1f0f 100%); }
+    .thumb-5 { background: linear-gradient(135deg, #2a1a1a 0%, #6b2a2a 60%, #1f0f0f 100%); }
+
+    .thumb-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.2);
+    }
+    .card-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(10,10,10,0.55);
+      opacity: 0;
+      transition: opacity 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .play-btn {
+      width: 52px; height: 52px;
+      border: 2px solid var(--amber);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      transform: scale(0.7);
+      opacity: 0;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+    .play-btn::after {
+      content: '';
+      width: 0; height: 0;
+      border-top: 9px solid transparent;
+      border-bottom: 9px solid transparent;
+      border-left: 14px solid var(--amber);
+      margin-left: 3px;
+    }
+
+    .card-info { padding: 1.25rem 1.4rem 1.4rem; }
+    .card-tags {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.6rem;
+    }
+    .tag {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--amber);
+      border: 1px solid rgba(232,168,56,0.3);
+      padding: 0.15rem 0.5rem;
+    }
+    .card-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--offwhite);
+      margin-bottom: 0.35rem;
+      letter-spacing: -0.01em;
+    }
+    .card-client {
+      font-size: 0.8rem;
+      color: var(--mid);
+    }
+
+    /* ── SHOWREEL STRIP ── */
+    .showreel-strip {
+      background: var(--teal);
+      padding: 5rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+    .showreel-text h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.6rem, 3vw, 2.6rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--offwhite);
+      margin-bottom: 0.5rem;
+    }
+    .showreel-text p { color: rgba(240,237,230,0.6); font-size: 0.95rem; }
+    .showreel-play {
+      flex-shrink: 0;
+      width: 80px; height: 80px;
+      border: 2px solid rgba(240,237,230,0.4);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .showreel-play:hover { border-color: var(--offwhite); transform: scale(1.08); }
+    .showreel-play::after {
+      content: '';
+      width: 0; height: 0;
+      border-top: 14px solid transparent;
+      border-bottom: 14px solid transparent;
+      border-left: 22px solid var(--offwhite);
+      margin-left: 5px;
+    }
+
+    /* ── SKILLS ── */
+    #skills { border-top: 1px solid rgba(255,255,255,0.06); }
+    .skills-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: start;
+    }
+    .skills-desc { color: var(--mid); font-size: 1rem; line-height: 1.75; }
+    .skills-desc strong { color: var(--offwhite); font-weight: 500; }
+    .tools-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+    .tool-item {
+      padding: 1.1rem 1.4rem;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      border-right: 1px solid rgba(255,255,255,0.07);
+      transition: background 0.2s;
+    }
+    .tool-item:hover { background: rgba(232,168,56,0.04); }
+    .tool-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--offwhite);
+      margin-bottom: 0.15rem;
+    }
+    .tool-role { font-size: 0.75rem; color: var(--mid); }
+
+    /* ── PROCESS ── */
+    #process { border-top: 1px solid rgba(255,255,255,0.06); }
+    .process-steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+      margin-top: 1rem;
+    }
+    .process-step {
+      background: var(--card-bg);
+      padding: 2rem 1.75rem;
+      border: 1px solid rgba(255,255,255,0.05);
+      transition: background 0.2s;
+    }
+    .process-step:hover { background: #161616; }
+    .step-phase {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 1.2rem;
+    }
+    .step-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--offwhite);
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.01em;
+    }
+    .step-desc { font-size: 0.85rem; color: var(--mid); line-height: 1.65; }
+
+    /* ── TESTIMONIALS ── */
+    #testimonials { border-top: 1px solid rgba(255,255,255,0.06); }
+    .testimonial-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+    .testimonial-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.05);
+      padding: 2rem 1.75rem;
+    }
+    .testimonial-quote {
+      font-size: 0.95rem;
+      color: var(--offwhite);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+    .testimonial-quote::before { content: '\201C'; color: var(--amber); font-size: 1.5rem; line-height: 0; vertical-align: -0.4rem; margin-right: 0.2rem; }
+    .testimonial-attribution { display: flex; align-items: center; gap: 0.85rem; }
+    .t-avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: var(--grey);
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--offwhite);
+    }
+    .t-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--offwhite);
+    }
+    .t-role { font-size: 0.75rem; color: var(--mid); }
+
+    /* ── CONTACT ── */
+    #contact {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      background: var(--card-bg);
+    }
+    .contact-inner {
+      max-width: 680px;
+    }
+    .contact-intro {
+      font-size: 1rem;
+      color: var(--mid);
+      line-height: 1.75;
+      margin-bottom: 2.5rem;
+    }
+    .contact-links {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border: 1px solid rgba(255,255,255,0.07);
+      margin-bottom: 3rem;
+    }
+    .contact-link {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .contact-link:last-child { border-bottom: none; }
+    .contact-link:hover { background: rgba(232,168,56,0.05); }
+    .contact-link span:first-child {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--offwhite);
+    }
+    .contact-link span:last-child { color: var(--amber); font-size: 1.1rem; }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 2rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .footer-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--mid);
+    }
+    .footer-credit { font-size: 0.75rem; color: rgba(107,107,107,0.5); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      .hero { padding: 0 1.5rem; min-height: 100svh; }
+      .hero-stats { display: none; }
+      section { padding: 4rem 1.5rem; }
+      .project-card.wide, .project-card.tall, .project-card.third {
+        grid-column: span 12;
+      }
+      .skills-layout { grid-template-columns: 1fr; gap: 2.5rem; }
+      .process-steps { grid-template-columns: 1fr 1fr; }
+      .testimonial-grid { grid-template-columns: 1fr; }
+      .showreel-strip { flex-direction: column; text-align: center; padding: 3.5rem 1.5rem; }
+      footer { padding: 1.5rem; flex-direction: column; gap: 0.5rem; text-align: center; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .filmstrip-track { animation: none; }
+      * { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a class="nav-logo" href="#">Maya<span>.</span>Chen</a>
+    <ul class="nav-links">
+      <li><a href="#work">Work</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#process">Process</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <p class="hero-eyebrow">Video Editor · Colorist · Motion Designer</p>
+    <h1 class="hero-headline">
+      Stories told<br>
+      <em>frame</em><br>
+      <span class="line2">by frame.</span>
+    </h1>
+    <p class="hero-sub">
+      Seven years of post-production across documentary, branded content, and narrative film.
+      Based in Los Angeles — working globally.
+    </p>
+    <div class="hero-ctas">
+      <a href="#work" class="btn-primary">View Work</a>
+      <a href="#contact" class="btn-ghost">Get in Touch</a>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-num">120+</div>
+        <div class="stat-label">Projects</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">40+</div>
+        <div class="stat-label">Clients</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">7yr</div>
+        <div class="stat-label">Experience</div>
+      </div>
+    </div>
+
+    <div class="filmstrip-wrap">
+      <div class="filmstrip-track">
+        <span>Documentary</span>
+        <span>Branded Content</span>
+        <span>Music Video</span>
+        <span>Color Grading</span>
+        <span>Motion Graphics</span>
+        <span>Short Film</span>
+        <span>Commercial</span>
+        <span>Social Content</span>
+        <span>Documentary</span>
+        <span>Branded Content</span>
+        <span>Music Video</span>
+        <span>Color Grading</span>
+        <span>Motion Graphics</span>
+        <span>Short Film</span>
+        <span>Commercial</span>
+        <span>Social Content</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORK -->
+  <section id="work">
+    <p class="section-eyebrow">Selected Work</p>
+    <h2 class="section-title">Recent Projects <span>— 2023–2025</span></h2>
+
+    <div class="project-grid">
+      <!-- Row 1 -->
+      <div class="project-card wide">
+        <div class="card-thumb thumb-1">
+          <span class="thumb-label">Replace with video thumbnail</span>
+          <div class="card-overlay"><div class="play-btn"></div></div>
+        </div>
+        <div class="card-info">
+          <div class="card-tags"><span class="tag">Documentary</span><span class="tag">Color</span></div>
+          <div class="card-title">Roots &amp; Routes — Feature Documentary</div>
+          <div class="card-client">Client: Sundance Film Festival · 2024</div>
+        </div>
+      </div>
+      <div class="project-card tall">
+        <div class="card-thumb thumb-2 ratio-tall">
+          <span class="thumb-label">Replace with video thumbnail</span>
+          <div class="card-overlay"><div class="play-btn"></div></div>
+        </div>
+        <div class="card-info">
+          <div class="card-tags"><span class="tag">Music Video</span></div>
+          <div class="card-title">Aurora — Official Music Video</div>
+          <div class="card-client">Client: Republic Records · 2024</div>
+        </div>
+      </div>
+
+      <!-- Row 2 -->
+      <div class="project-card third">
+        <div class="card-thumb thumb-3">
+          <span class="thumb-label">Replace with video thumbnail</span>
+          <div class="card-overlay"><div class="play-btn"></div></div>
+        </div>
+        <div class="card-info">
+          <div class="card-tags"><span class="tag">Brand</span></div>
+          <div class="card-title">Launch Campaign — Nike Run Club</div>
+          <div class="card-client">Client: Nike · 2025</div>
+        </div>
+      </div>
+      <div class="project-card third">
+        <div class="card-thumb thumb-4">
+          <span class="thumb-label">Replace with video thumbnail</span>
+          <div class="card-overlay"><div class="play-btn"></div></div>
+        </div>
+        <div class="card-info">
+          <div class="card-tags"><span class="tag">Short Film</span><span class="tag">Motion</span></div>
+          <div class="card-title">Between Tides</div>
+          <div class="card-client">Client: Vimeo Staff Pick · 2023</div>
+        </div>
+      </div>
+      <div class="project-card third">
+        <div class="card-thumb thumb-5">
+          <span class="thumb-label">Replace with video thumbnail</span>
+          <div class="card-overlay"><div class="play-btn"></div></div>
+        </div>
+        <div class="card-info">
+          <div class="card-tags"><span class="tag">Commercial</span></div>
+          <div class="card-title">Holiday Anthem — Apple</div>
+          <div class="card-client">Client: Apple Inc. · 2024</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SHOWREEL STRIP -->
+  <div class="showreel-strip">
+    <div class="showreel-text">
+      <h2>Watch the 2025 Showreel</h2>
+      <p>Three minutes. Every genre. No filler.</p>
+    </div>
+    <div class="showreel-play" role="button" aria-label="Play showreel"></div>
+  </div>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <p class="section-eyebrow">Capabilities</p>
+    <h2 class="section-title">What I bring <span>to the edit</span></h2>
+
+    <div class="skills-layout">
+      <div>
+        <p class="skills-desc">
+          I specialise in <strong>narrative-first editing</strong> — finding the emotional spine of a cut
+          before worrying about pace or rhythm. From assembly to picture lock, I work closely with
+          directors and brands to protect the story through every revision.
+          <br><br>
+          My colour work ranges from naturalistic doc grades to highly stylised LUT-based looks for
+          branded content. Motion graphics and title design are built in-house, keeping the creative
+          loop tight and fast.
+        </p>
+      </div>
+      <div class="tools-grid">
+        <div class="tool-item">
+          <div class="tool-name">Premiere Pro</div>
+          <div class="tool-role">Primary NLE</div>
+        </div>
+        <div class="tool-item">
+          <div class="tool-name">DaVinci Resolve</div>
+          <div class="tool-role">Color &amp; Finishing</div>
+        </div>
+        <div class="tool-item">
+          <div class="tool-name">After Effects</div>
+          <div class="tool-role">Motion Graphics</div>
+        </div>
+        <div class="tool-item">
+          <div class="tool-name">Final Cut Pro</div>
+          <div class="tool-role">Multicam / Broadcast</div>
+        </div>
+        <div class="tool-item">
+          <div class="tool-name">Audition</div>
+          <div class="tool-role">Audio Mix &amp; Repair</div>
+        </div>
+        <div class="tool-item">
+          <div class="tool-name">Frame.io</div>
+          <div class="tool-role">Client Review</div>
+        </div>
+        <div class="tool-item">
+          <div class="tool-name">Mocha Pro</div>
+          <div class="tool-role">Tracking &amp; VFX</div>
+        </div>
+        <div class="tool-item">
+          <div class="tool-name">Notion / Airtable</div>
+          <div class="tool-role">Production PM</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section id="process">
+    <p class="section-eyebrow">How I Work</p>
+    <h2 class="section-title">The process</h2>
+    <div class="process-steps">
+      <div class="process-step">
+        <div class="step-phase">Phase 01</div>
+        <div class="step-title">Brief &amp; Discovery</div>
+        <div class="step-desc">A focused call to understand your story, your audience, and what success looks like before a single frame is cut.</div>
+      </div>
+      <div class="process-step">
+        <div class="step-phase">Phase 02</div>
+        <div class="step-title">Rough Assembly</div>
+        <div class="step-desc">All selects organised. A first cut that finds the emotional arc — imperfect on purpose, open to change.</div>
+      </div>
+      <div class="process-step">
+        <div class="step-phase">Phase 03</div>
+        <div class="step-title">Revision Loop</div>
+        <div class="step-desc">Two rounds of structured feedback via Frame.io. Every comment addressed, every change tracked and explained.</div>
+      </div>
+      <div class="process-step">
+        <div class="step-phase">Phase 04</div>
+        <div class="step-title">Delivery</div>
+        <div class="step-desc">Picture lock, audio polish, colour grade, and exports in every format you need — on time, with full project handover.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section id="testimonials">
+    <p class="section-eyebrow">Client Feedback</p>
+    <h2 class="section-title">What they said</h2>
+    <div class="testimonial-grid">
+      <div class="testimonial-card">
+        <p class="testimonial-quote">Maya had the cut ready before I finished writing the brief. Somehow it was exactly what I'd imagined — and better.</p>
+        <div class="testimonial-attribution">
+          <div class="t-avatar">JR</div>
+          <div>
+            <div class="t-name">James Rivera</div>
+            <div class="t-role">Creative Director, Droga5</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-quote">The colour work on our documentary changed the entire tone of the film. Subtle but transformative — exactly what we needed.</p>
+        <div class="testimonial-attribution">
+          <div class="t-avatar">SL</div>
+          <div>
+            <div class="t-name">Sophie Laurent</div>
+            <div class="t-role">Director, Sundance 2024</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-quote">Three revision rounds, zero stress. Maya keeps the feedback loop tight and always explains her editorial choices.</p>
+        <div class="testimonial-attribution">
+          <div class="t-avatar">AK</div>
+          <div>
+            <div class="t-name">Alex Kim</div>
+            <div class="t-role">Brand Lead, Nike</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <p class="section-eyebrow">Get in Touch</p>
+    <h2 class="section-title">Let's make <span>something.</span></h2>
+    <div class="contact-inner">
+      <p class="contact-intro">
+        Available for freelance projects, long-term collaborations, and full-time roles starting Q3 2025.
+        I respond to every message within one business day.
+      </p>
+      <div class="contact-links">
+        <a href="mailto:hello@mayachen.co" class="contact-link">
+          <span>hello@mayachen.co</span>
+          <span>↗</span>
+        </a>
+        <a href="#" class="contact-link">
+          <span>LinkedIn</span>
+          <span>↗</span>
+        </a>
+        <a href="#" class="contact-link">
+          <span>Vimeo</span>
+          <span>↗</span>
+        </a>
+        <a href="#" class="contact-link">
+          <span>Instagram</span>
+          <span>↗</span>
+        </a>
+      </div>
+      <a href="#" class="btn-primary">Download Rate Card</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-name">Maya Chen © 2025</div>
+    <div class="footer-credit">Los Angeles, CA — Available globally</div>
+  </footer>
+
+</body>
+</html>
